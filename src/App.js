@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { BrowserRouter, Router, Route, Switch, withRouter, Link } from 'react-router-dom';
+import { BrowserRouter, Router, Route, Switch, withRouter, Redirect, Link } from 'react-router-dom';
 import { createBrowserHistory } from 'history';
 
 import logo from './logo.svg';
@@ -57,11 +57,11 @@ const navigation = [
 
 const MainMenu = (props) => {
   const handleOnItemClick = (e) => {
-    console.log(props);
-    console.log(e);
+    //console.log(props);
+    //console.log(e);
 
     const url = `/${e.itemData.route}`;
-    console.log(url);
+    //console.log(url);
 
     props.history.push(url);
   }
@@ -75,6 +75,18 @@ const MainMenu = (props) => {
 
 const MainMenuWithRouter = withRouter(MainMenu);
 const DrawerWithRouter = withRouter(Drawer);
+
+const SecretRoute = ({ component: Component, ...rest }) => {
+  const isAuthenticated = true;
+
+  return(
+    <Route {...rest} render={(props) => (
+      isAuthenticated === true
+        ? <Component {...props} />
+        : <Redirect to='/login' />
+    )} />  
+  )
+};
 
 const App = (props) => {
   const [opened, setOpened] = useState(true);
@@ -92,19 +104,23 @@ const App = (props) => {
     }
   }];
 
+  const history1 = createBrowserHistory();
+
   return (
     <div className="App">
-      <Toolbar items={toolbarItems}></Toolbar>
+      <Toolbar key={'toolbarApp'} items={toolbarItems}></Toolbar>
       <BrowserRouter>
         <DrawerWithRouter opened={opened} component={MainMenuWithRouter} >
-          <Switch>
-            <Route exact={true} path="/" component={Dashboard} />
-            <Route path="/dash" component={Dashboard} />
-            <Route path="/product" component={Product} />
-            <Route path="/customer" component={Customer} />
-            <Route path="/employee" component={Employee} />
-            <Route path="/about" component={About} />
-          </Switch>
+          <div key={'content1'}>
+            <Switch>
+              <Route exact={true} path="/" component={Dashboard} />
+              <Route path="/dash" component={Dashboard} />
+              <Route path="/product" component={Product} />
+              <Route path="/customer" component={Customer} />
+              <Route path="/employee" component={Employee} />
+              <Route path="/about" component={About} />
+            </Switch>
+          </div>
         </DrawerWithRouter>
       </BrowserRouter>
     </div>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Router, Route, Switch } from 'react-router-dom';
+import { BrowserRouter, Router, Route, Switch, withRouter, Link } from 'react-router-dom';
 import { createBrowserHistory } from 'history';
 
 import logo from './logo.svg';
@@ -56,19 +56,32 @@ const navigation = [
 ];
 
 const MainMenu = (props) => {
+  const handleOnItemClick = (e) => {
+    console.log(props);
+    console.log(e);
+
+    const url = `/${e.itemData.route}`;
+    console.log(url);
+
+    props.history.push(url);
+  }
+
   return(
     <>
-      <TreeView dataSource={navigation} onItemClick={ (e) => console.log(props) } />
-      {/* <TreeView dataSource={navigation} onItemClick={ (e) => props.history.push(`/${e.itemData.route}`) } /> */}
+      <TreeView id={'treeViewMainMenu'} keyExpr={'id'} parentIdExpr={'parentId'} dataSource={navigation} onItemClick={handleOnItemClick} />
     </>
   )
 }
 
+const MainMenuWithRouter = withRouter(MainMenu);
+const DrawerWithRouter = withRouter(Drawer);
+
 const App = (props) => {
   const [opened, setOpened] = useState(true);
 
-  const history = createBrowserHistory();
-  console.log(history);
+  // console.log(props);
+  // const history = createBrowserHistory();
+  // console.log(history);
 
   const toolbarItems = [{
     widget: 'dxButton',
@@ -82,8 +95,8 @@ const App = (props) => {
   return (
     <div className="App">
       <Toolbar items={toolbarItems}></Toolbar>
-      <Drawer opened={opened} openedStateMode={'shrink'} position={'left'} component={MainMenu} closeOnOutsideClick={true} >
-        <Router history={history}>
+      <BrowserRouter>
+        <DrawerWithRouter opened={opened} component={MainMenuWithRouter} >
           <Switch>
             <Route exact={true} path="/" component={Dashboard} />
             <Route path="/dash" component={Dashboard} />
@@ -92,10 +105,10 @@ const App = (props) => {
             <Route path="/employee" component={Employee} />
             <Route path="/about" component={About} />
           </Switch>
-        </Router>
-      </Drawer>
+        </DrawerWithRouter>
+      </BrowserRouter>
     </div>
-  );
+  )
 }
 
 export default App;
